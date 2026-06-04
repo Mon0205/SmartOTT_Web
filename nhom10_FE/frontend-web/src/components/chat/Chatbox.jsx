@@ -184,6 +184,8 @@ export default function ChatBox({
   const [cursor, setCursor] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const sendLockRef = useRef(false);
   const isAtBottomRef = useRef(true);
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   const isFirstLoad = useRef(true);
@@ -957,76 +959,86 @@ export default function ChatBox({
   }, []);
 
   const sendMessage = async () => {
+    if (sendLockRef.current) return;
     if (!selected?._id) return;
     if (chatLocked) return;
+    if (!message.trim() && !file && !editingMessage) return;
+
+    sendLockRef.current = true;
+    setIsSendingMessage(true);
     stopTyping();
 
-    if (editingMessage) {
-      const res = await editMessageAPI({
-        messageId: editingMessage._id,
-        content: message,
-      });
+    try {
+      if (editingMessage) {
+        const res = await editMessageAPI({
+          messageId: editingMessage._id,
+          content: message,
+        });
 
-      if (res.success) {
-        setMessages((prev) =>
-          prev.map((m) => {
-            if (m._id === editingMessage._id) {
-              return {
-                ...m,
-                content: message,
-                isEdited: true,
-              };
-            }
-            if (m.replyTo?._id === editingMessage._id) {
-              return {
-                ...m,
-                replyTo: {
-                  ...m.replyTo,
+        if (res.success) {
+          setMessages((prev) =>
+            prev.map((m) => {
+              if (m._id === editingMessage._id) {
+                return {
+                  ...m,
                   content: message,
                   isEdited: true,
-                },
-              };
-            }
-            return m;
-          })
-        );
-      }
+                };
+              }
+              if (m.replyTo?._id === editingMessage._id) {
+                return {
+                  ...m,
+                  replyTo: {
+                    ...m.replyTo,
+                    content: message,
+                    isEdited: true,
+                  },
+                };
+              }
+              return m;
+            })
+          );
+        }
 
-      setEditingMessage(null);
-      setMessage("");
-      return;
-    }
-
-    let fileUrl = null;
-    let type = "text";
-
-    if (file) {
-      if (file.size > MAX_FILE_SIZE) {
-        alert("Khong gui duoc file tren 10MB");
-        setFile(null);
+        setEditingMessage(null);
+        setMessage("");
         return;
       }
-      fileUrl = await uploadFile(file);
-      if (file.type.startsWith("image")) type = "image";
-      else if (file.type.startsWith("video")) type = "video";
-      else type = "file";
+
+      let fileUrl = null;
+      let type = "text";
+
+      if (file) {
+        if (file.size > MAX_FILE_SIZE) {
+          alert("Khong gui duoc file tren 10MB");
+          setFile(null);
+          return;
+        }
+        fileUrl = await uploadFile(file);
+        if (file.type.startsWith("image")) type = "image";
+        else if (file.type.startsWith("video")) type = "video";
+        else type = "file";
+      }
+
+      await sendMessageAPI({
+        conversationId: selected._id,
+        content: message,
+        type,
+        fileUrl,
+        fileName: file?.name,
+        fileSize: file?.size,
+        replyTo: replyMessage?._id,
+      });
+
+      setMessage("");
+      setFile(null);
+      setReplyMessage(null);
+
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    } finally {
+      sendLockRef.current = false;
+      setIsSendingMessage(false);
     }
-
-    const res = await sendMessageAPI({
-      conversationId: selected._id,
-      content: message,
-      type,
-      fileUrl,
-      fileName: file?.name,
-      fileSize: file?.size,
-      replyTo: replyMessage?._id,
-    });
-
-    setMessage("");
-    setFile(null);
-    setReplyMessage(null);
-
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleKeyDown = (e) => {
@@ -2213,7 +2225,7 @@ export default function ChatBox({
                   onFocus={emitSeen}
                   onChange={handleMessageInputChange}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") sendMessage();
+                    if (e.key === "Enter" && !isSendingMessage) sendMessage();
                   }}
                   className="form-control border-0 bg-transparent shadow-none px-0"
                   style={{ outline: "none" }}
@@ -2233,7 +2245,7 @@ export default function ChatBox({
                 onClick={sendMessage}
                 className="btn btn-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                 style={{ width: "40px", height: "40px" }}
-                disabled={!message.trim() && !file}
+                disabled={isSendingMessage || (!message.trim() && !file)}
               >
                 <FaPaperPlane size={15} />
               </button>

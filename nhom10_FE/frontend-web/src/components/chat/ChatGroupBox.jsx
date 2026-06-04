@@ -146,6 +146,7 @@ export default function ChatGroupBox({ selected, setUnreadMap, loadChats, onGrou
   const loadingMoreRef = useRef(false);
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
+  const sendLockRef = useRef(false);
 
   // Modal Forward
   const [showForwardModal, setShowForwardModal] = useState(false);
@@ -452,9 +453,11 @@ export default function ChatGroupBox({ selected, setUnreadMap, loadChats, onGrou
 
   // ================= SEND MESSAGE =================
   const sendMessage = async () => {
+    if (sendLockRef.current || isSendingFiles) return;
     if (!selected?._id) return;
     if (groupDissolved) return;
     if (!message.trim() && files.length === 0 && !editingMessage) return;
+    sendLockRef.current = true;
     stopTyping();
 
     // Sá»­a tin nháº¯n
@@ -467,7 +470,7 @@ export default function ChatGroupBox({ selected, setUnreadMap, loadChats, onGrou
           return m;
         }));
       }
-      setEditingMessage(null); setMessage(""); return;
+      setEditingMessage(null); setMessage(""); sendLockRef.current = false; return;
     }
 
     setIsSendingFiles(true);
@@ -504,6 +507,7 @@ export default function ChatGroupBox({ selected, setUnreadMap, loadChats, onGrou
     setReplyMessage(null);
     setIsSendingFiles(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    sendLockRef.current = false;
   };
 
 
@@ -918,7 +922,7 @@ export default function ChatGroupBox({ selected, setUnreadMap, loadChats, onGrou
         {/* ðŸ‘‰ THÃŠM THUá»˜C TÃNH multiple Äá»‚ CHá»ŒN NHIá»€U FILE */}
         <input type="file" multiple hidden ref={fileInputRef} onChange={handleFileChange} />
 
-        <input className="form-control" placeholder={editingMessage ? "Sửa tin nhắn..." : "Nhập tin nhắn..."} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendMessage()} disabled={isSendingFiles} />
+        <input className="form-control" placeholder={editingMessage ? "Sửa tin nhắn..." : "Nhập tin nhắn..."} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !isSendingFiles && sendMessage()} disabled={isSendingFiles} />
 
         <button className="btn btn-light" onClick={() => setShowEmoji(!showEmoji)}>😊</button>
         <button className="btn btn-primary d-flex align-items-center gap-2" onClick={sendMessage} disabled={isSendingFiles}>
