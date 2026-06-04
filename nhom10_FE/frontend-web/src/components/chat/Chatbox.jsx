@@ -208,6 +208,15 @@ export default function ChatBox({
     sad: "😢",
     angry: "😡"
   };
+  const getReactionEmoji = (type) => ({
+    like: String.fromCodePoint(0x1f44d),
+    love: "\u2764\ufe0f",
+    haha: String.fromCodePoint(0x1f602),
+    wow: String.fromCodePoint(0x1f62e),
+    sad: String.fromCodePoint(0x1f622),
+    angry: String.fromCodePoint(0x1f621),
+  }[type] || "");
+
   const handleReact = async (messageId, type) => {
     try {
       await reactMessageAPI(messageId, type);
@@ -1577,15 +1586,18 @@ export default function ChatBox({
                 borderRadius: 20,
                 padding: "2px 8px",
                 display: "flex",
+                alignItems: "center",
                 gap: 6,
                 fontSize: 12,
+                lineHeight: 1,
+                whiteSpace: "nowrap",
                 boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                 zIndex: 5
               }}
             >
               {Object.entries(groupedReactions).map(([type, count]) => (
-                <span key={type}>
-                  {emojiMap[type]} {count}
+                <span key={type} style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                  {getReactionEmoji(type)} {count}
                 </span>
               ))}
             </div>
@@ -1601,7 +1613,9 @@ export default function ChatBox({
                 borderRadius: 20,
                 padding: "6px 20px",
                 display: "flex",
+                alignItems: "center",
                 gap: 10,
+                lineHeight: 1,
                 boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
                 zIndex: 9999
               }}
@@ -1623,7 +1637,7 @@ export default function ChatBox({
                   onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.3)")}
                   onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
                 >
-                  {emojiMap[r]}
+                  {getReactionEmoji(r)}
                 </span>
               ))}
             </div>

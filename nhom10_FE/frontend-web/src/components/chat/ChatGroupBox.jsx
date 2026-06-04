@@ -158,6 +158,15 @@ export default function ChatGroupBox({ selected, setUnreadMap, loadChats, onGrou
   const groupDissolved = selected?.isActive === false;
   const emojiMap = { like: "ðŸ‘", love: "â¤ï¸", haha: "ðŸ˜‚", wow: "ðŸ˜®", sad: "ðŸ˜¢", angry: "ðŸ˜¡" };
 
+  const getReactionEmoji = (type) => ({
+    like: String.fromCodePoint(0x1f44d),
+    love: "\u2764\ufe0f",
+    haha: String.fromCodePoint(0x1f602),
+    wow: String.fromCodePoint(0x1f62e),
+    sad: String.fromCodePoint(0x1f622),
+    angry: String.fromCodePoint(0x1f621),
+  }[type] || "");
+
   const formatTime = (dateString) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -609,8 +618,8 @@ export default function ChatGroupBox({ selected, setUnreadMap, loadChats, onGrou
     const grouped = (m.reactions || []).reduce((acc, r) => { acc[r.type] = (acc[r.type] || 0) + 1; return acc; }, {});
     if (Object.keys(grouped).length === 0) return null;
     return (
-      <div style={{ position: "absolute", bottom: "-28px", right: isMine ? "10px" : "auto", left: isMine ? "auto" : "10px", background: "#fff", borderRadius: 20, padding: "2px 8px", display: "flex", gap: 6, fontSize: 12, boxShadow: "0 2px 6px rgba(0,0,0,0.2)", zIndex: 5 }}>
-        {Object.entries(grouped).map(([type, count]) => (<span key={type}>{emojiMap[type]} {count}</span>))}
+      <div style={{ position: "absolute", bottom: "-28px", right: isMine ? "10px" : "auto", left: isMine ? "auto" : "10px", background: "#fff", borderRadius: 20, padding: "2px 8px", display: "flex", alignItems: "center", gap: 6, fontSize: 12, lineHeight: 1, whiteSpace: "nowrap", boxShadow: "0 2px 6px rgba(0,0,0,0.2)", zIndex: 5 }}>
+        {Object.entries(grouped).map(([type, count]) => (<span key={type} style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>{getReactionEmoji(type)} {count}</span>))}
       </div>
     );
   };
@@ -623,8 +632,8 @@ export default function ChatGroupBox({ selected, setUnreadMap, loadChats, onGrou
           <FaHeart size={13} color={grouped.like ? "#ff4d4f" : "#999"} />
         </div>
         {reactionHoverId === m._id && (
-          <div style={{ position: "absolute", bottom: "4px", right: isMine ? "0" : "auto", left: isMine ? "auto" : "0", background: "#fff", borderRadius: 30, padding: "8px 14px", display: "flex", gap: 10, boxShadow: "0 4px 12px rgba(0,0,0,0.2)", zIndex: 9999 }} onMouseEnter={() => setReactionHoverId(m._id)} onMouseLeave={() => setReactionHoverId(null)}>
-            {["like", "love", "haha", "wow", "sad", "angry"].map((type) => (<span key={type} style={{ fontSize: 21, cursor: "pointer" }} onClick={() => handleReaction(m, type)}>{emojiMap[type]}</span>))}
+          <div style={{ position: "absolute", bottom: "4px", right: isMine ? "0" : "auto", left: isMine ? "auto" : "0", background: "#fff", borderRadius: 30, padding: "8px 14px", display: "flex", alignItems: "center", gap: 10, lineHeight: 1, boxShadow: "0 4px 12px rgba(0,0,0,0.2)", zIndex: 9999 }} onMouseEnter={() => setReactionHoverId(m._id)} onMouseLeave={() => setReactionHoverId(null)}>
+            {["like", "love", "haha", "wow", "sad", "angry"].map((type) => (<span key={type} style={{ fontSize: 21, cursor: "pointer" }} onClick={() => handleReaction(m, type)}>{getReactionEmoji(type)}</span>))}
           </div>
         )}
       </>
