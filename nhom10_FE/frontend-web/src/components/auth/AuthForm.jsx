@@ -9,7 +9,7 @@ export default function AuthForm({
   onSubmit,
 }) {
   return (
-    <form onSubmit={onSubmit}>
+    <form className="auth-form" onSubmit={onSubmit}>
       {!isLogin && (
         <>
           <FormField
@@ -58,7 +58,7 @@ export default function AuthForm({
         />
       )}
 
-      <button className="btn btn-primary w-100 mt-2" disabled={loading}>
+      <button className="auth-submit" disabled={loading}>
         {loading
           ? "Dang xu ly..."
           : isLogin

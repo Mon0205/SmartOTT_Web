@@ -5,6 +5,8 @@ import { getSocket } from "../socket/socket";
 import { useAuth } from "../context/AuthContext";
 import AuthForm from "../components/auth/AuthForm";
 import AuthSwitch from "../components/auth/AuthSwitch";
+import { FaComments, FaLock, FaShieldAlt, FaUsers } from "react-icons/fa";
+import "./AuthPage.css";
 
 const initialForm = {
   email: "",
@@ -133,32 +135,89 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="container-fluid vh-100 d-flex justify-content-center align-items-center bg-light">
-      <div className="card p-4 shadow" style={{ width: "350px" }}>
-        <h3 className="text-center mb-3">
-          {isLogin ? "Dang nhap" : "Dang ky"}
-        </h3>
-
-        {errors.general && (
-          <div className="alert alert-danger py-2 text-center">
-            {errors.general}
+    <div className="auth-page">
+      <div className="auth-shell">
+        <section className="auth-brand-panel">
+          <div className="auth-brand">
+            <div className="auth-logo">
+              <FaComments />
+            </div>
+            <div>
+              <div className="auth-brand-name">ConnectHub</div>
+              <div className="auth-brand-subtitle">Chat, nhom va AI tro ly</div>
+            </div>
           </div>
-        )}
 
-        <AuthForm
-          isLogin={isLogin}
-          loading={loading}
-          errors={errors}
-          form={form}
-          onFieldChange={handleFieldChange}
-          onSubmit={handleSubmit}
-        />
+          <div className="auth-hero">
+            <h1>Ket noi moi cuoc tro chuyen trong mot noi.</h1>
+            <p>
+              Dang nhap de tiep tuc nhan tin, quan ly nhom chat va su dung tro ly AI
+              trong khong gian lam viec gon gang.
+            </p>
+          </div>
 
-        <AuthSwitch
-          isLogin={isLogin}
-          onSwitchMode={setIsLogin}
-          onForgotPassword={() => navigate("/forgot-password")}
-        />
+          <div className="auth-feature-list">
+            <div className="auth-feature">
+              <span><FaLock /></span>
+              <div>
+                <strong>Bao mat phien dang nhap</strong>
+                <small>Dong bo realtime va bao ve tai khoan cua ban.</small>
+              </div>
+            </div>
+            <div className="auth-feature">
+              <span><FaUsers /></span>
+              <div>
+                <strong>Tro chuyen ca nhan va nhom</strong>
+                <small>Theo doi tin moi, loi moi va cac nhom dang tham gia.</small>
+              </div>
+            </div>
+            <div className="auth-feature">
+              <span><FaShieldAlt /></span>
+              <div>
+                <strong>Quan tri ro rang</strong>
+                <small>Luong admin tach rieng, de quan ly va kiem soat.</small>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="auth-card">
+          <div className="auth-card-header">
+            <div className="auth-mobile-brand">
+              <div className="auth-logo small">
+                <FaComments />
+              </div>
+              <span>ConnectHub</span>
+            </div>
+            <h2>{isLogin ? "Dang nhap" : "Tao tai khoan"}</h2>
+            <p>
+              {isLogin
+                ? "Chao mung tro lai. Nhap thong tin de tiep tuc."
+                : "Dang ky bang email va xac thuc OTP de bat dau."}
+            </p>
+          </div>
+
+          {errors.general && (
+            <div className="auth-alert">
+              {errors.general}
+            </div>
+          )}
+
+          <AuthForm
+            isLogin={isLogin}
+            loading={loading}
+            errors={errors}
+            form={form}
+            onFieldChange={handleFieldChange}
+            onSubmit={handleSubmit}
+          />
+
+          <AuthSwitch
+            isLogin={isLogin}
+            onSwitchMode={setIsLogin}
+            onForgotPassword={() => navigate("/forgot-password")}
+          />
+        </section>
       </div>
     </div>
   );
