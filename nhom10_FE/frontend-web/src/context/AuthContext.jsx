@@ -41,7 +41,6 @@ export const AuthProvider = ({ children }) => {
 
     socket.on("force_logout", () => {
       logout();
-      window.location.href = "/login";
     });
   };
 

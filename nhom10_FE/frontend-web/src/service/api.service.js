@@ -31,7 +31,7 @@ api.interceptors.response.use(
       console.log("Auto logout do 401");
 
       localStorage.clear();
-      window.location.href = "/login";
+      window.location.replace("/");
     }
 
     return Promise.reject(err);

@@ -267,7 +267,7 @@ export default function useChatPage() {
 
     } else if (res.status === 401) {
       localStorage.clear();
-      window.location.href = "/login";
+      navigate("/login", { replace: true });
     }
   };
 

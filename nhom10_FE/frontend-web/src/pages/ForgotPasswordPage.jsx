@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   forgotPasswordAPI,
   resetPasswordAPI,
@@ -7,6 +8,7 @@ import {
 import ForgotPasswordSteps from "../components/auth/ForgotPasswordSteps";
 
 export default function ForgotPasswordPage() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -104,7 +106,7 @@ export default function ForgotPasswordPage() {
 
       if (res.success) {
         alert("Doi mat khau thanh cong!");
-        window.location.href = "/login";
+        navigate("/login", { replace: true });
       } else {
         alert(res.message);
       }

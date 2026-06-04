@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { FaCommentDots, FaUsers, FaSignOutAlt, FaRobot } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { updateProfile, updateAvatar, updatePassword, deleteMyAccount } from "../../api/userApi";
-import { disconnectSocket } from "../../socket/socket";
 
 export default function Panel({
   tab,
@@ -11,7 +11,8 @@ export default function Panel({
   setFriendSection,
   hasNewFriendRequest,
 }) {
-  const { user, setUser } = useAuth();
+  const { user, logout: authLogout } = useAuth();
+  const navigate = useNavigate();
 
   const [showProfile, setShowProfile] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -35,10 +36,8 @@ export default function Panel({
   });
 
   const logout = () => {
-    localStorage.clear();
-    setUser(null);
-    disconnectSocket();
-    window.location.href = "/login";
+    authLogout();
+    navigate("/login", { replace: true });
   };
 
   useEffect(() => {
