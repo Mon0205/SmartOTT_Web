@@ -21,6 +21,7 @@ import {
 } from "react-icons/fa";
 
 import GroupInfoModal from "./GroupInfoModal";
+import ChatAvatar from "./ChatAvatar";
 
 import {
   getMessages,
@@ -750,7 +751,13 @@ export default function ChatGroupBox({ selected, setUnreadMap, loadChats, onGrou
                 {seenUsers.length > 0 ? (
                   <div className="d-flex align-items-center">
                     {(m.seenBy || []).filter((s) => String(s.userId?._id || s.userId) !== String(myId)).slice(0, 5).map((s, idx) => (
-                      <img key={idx} src={s.userId?.avatar || "https://i.pravatar.cc/30"} alt="" title={s.userId?.fullName} style={{ width: 18, height: 18, borderRadius: "50%", objectFit: "cover", marginLeft: idx === 0 ? 0 : -5, border: "1px solid #fff" }} />
+                      <ChatAvatar
+                        key={idx}
+                        src={s.userId?.avatar}
+                        size={18}
+                        title={s.userId?.fullName}
+                        style={{ marginLeft: idx === 0 ? 0 : -5, border: "1px solid #fff" }}
+                      />
                     ))}
                   </div>
                 ) : deliveredUsers.length > 0 ? <span style={{ color: m.type === 'image' ? '#fff' : "#0068ff" }}>âœ“âœ“</span> : <span>âœ“</span>}
@@ -927,7 +934,7 @@ export default function ChatGroupBox({ selected, setUnreadMap, loadChats, onGrou
               {conversationsList.length === 0 ? <div className="text-center text-muted p-4">Không có cuộc trò chuyện nào</div> : conversationsList.map((item) => (
                 <div key={item._id} className="d-flex align-items-center p-2 border-bottom" style={{ cursor: "pointer", backgroundColor: selectedForwardTargets.includes(item._id) ? "#f0f7ff" : "transparent" }} onClick={() => toggleForwardTarget(item._id)}>
                   <input type="checkbox" className="form-check-input me-3" checked={selectedForwardTargets.includes(item._id)} readOnly style={{ transform: "scale(1.2)", cursor: "pointer" }} />
-                  <img src={item.avatar || "https://i.pravatar.cc/100"} alt="" style={{ width: "45px", height: "45px", borderRadius: "50%", objectFit: "cover" }} className="me-3" />
+                  <ChatAvatar src={item.avatar} type={item.isGroup ? "group" : "user"} size={45} className="me-3" title={item.name} />
                   <div><div className="fw-bold">{item.name}</div>{item.isGroup && <small className="text-muted">Nhóm chat</small>}</div>
                 </div>
               ))}

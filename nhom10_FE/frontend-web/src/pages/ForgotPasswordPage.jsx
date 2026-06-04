@@ -6,6 +6,8 @@ import {
   verifyResetOtpAPI,
 } from "../api/authApi";
 import ForgotPasswordSteps from "../components/auth/ForgotPasswordSteps";
+import { FaArrowLeft, FaComments, FaEnvelope, FaKey, FaLock, FaShieldAlt } from "react-icons/fa";
+import "./AuthPage.css";
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -117,46 +119,110 @@ export default function ForgotPasswordPage() {
     }
   };
 
+  const stepTitle =
+    step === 1 ? "Khoi phuc mat khau" : step === 2 ? "Xac thuc OTP" : "Tao mat khau moi";
+  const stepDescription =
+    step === 1
+      ? "Nhap email da dang ky de nhan ma OTP dat lai mat khau."
+      : step === 2
+      ? "Kiem tra email va nhap ma OTP gom 6 chu so."
+      : "Dat mat khau moi de bao ve tai khoan cua ban.";
+
   return (
-    <div className="container vh-100 d-flex justify-content-center align-items-center">
-      <div className="card p-4 shadow text-center" style={{ width: "360px" }}>
-        <h4>Quen mat khau</h4>
-        <ForgotPasswordSteps
-          step={step}
-          loading={loading}
-          email={email}
-          setEmail={setEmail}
-          otp={otp}
-          inputsRef={inputsRef}
-          newPassword={newPassword}
-          setNewPassword={setNewPassword}
-          confirm={confirm}
-          setConfirm={setConfirm}
-          onSendOtp={handleSendOtp}
-          onVerifyOtp={handleVerifyOtp}
-          onResetPassword={handleResetPassword}
-          onOtpChange={handleOtpChange}
-          onOtpKeyDown={handleOtpKeyDown}
-          onOtpPaste={handleOtpPaste}
-        />
+    <div className="auth-page">
+      <div className="auth-shell">
+        <section className="auth-brand-panel">
+          <div className="auth-brand">
+            <div className="auth-logo">
+              <FaComments />
+            </div>
+            <div>
+              <div className="auth-brand-name">ConnectHub</div>
+              <div className="auth-brand-subtitle">Bao ve tai khoan cua ban</div>
+            </div>
+          </div>
+
+          <div className="auth-hero">
+            <h1>Lay lai quyen truy cap mot cach an toan.</h1>
+            <p>
+              Quy trinh OTP giup xac minh dung email truoc khi cho phep dat lai
+              mat khau moi.
+            </p>
+          </div>
+
+          <div className="auth-feature-list">
+            <div className="auth-feature">
+              <span><FaEnvelope /></span>
+              <div>
+                <strong>Gui ma qua email</strong>
+                <small>Ma OTP chi gui den email da dang ky tai khoan.</small>
+              </div>
+            </div>
+            <div className="auth-feature">
+              <span><FaKey /></span>
+              <div>
+                <strong>Xac thuc tung buoc</strong>
+                <small>Nhap OTP truoc khi duoc tao mat khau moi.</small>
+              </div>
+            </div>
+            <div className="auth-feature">
+              <span><FaShieldAlt /></span>
+              <div>
+                <strong>Hoan tat nhanh gon</strong>
+                <small>Sau khi doi mat khau, ban quay lai dang nhap ngay.</small>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="auth-card">
+          <div className="auth-card-header">
+            <div className="auth-mobile-brand">
+              <div className="auth-logo small">
+                <FaComments />
+              </div>
+              <span>ConnectHub</span>
+            </div>
+
+            <button className="auth-back-button" onClick={() => navigate("/login", { replace: true })}>
+              <FaArrowLeft />
+              Dang nhap
+            </button>
+
+            <div className="auth-step-icon">
+              <FaLock />
+            </div>
+
+            <h2>{stepTitle}</h2>
+            <p>{stepDescription}</p>
+          </div>
+
+          <div className="auth-stepper" aria-label="Tien trinh khoi phuc mat khau">
+            {[1, 2, 3].map((item) => (
+              <span key={item} className={item <= step ? "active" : ""} />
+            ))}
+          </div>
+
+          <ForgotPasswordSteps
+            step={step}
+            loading={loading}
+            email={email}
+            setEmail={setEmail}
+            otp={otp}
+            inputsRef={inputsRef}
+            newPassword={newPassword}
+            setNewPassword={setNewPassword}
+            confirm={confirm}
+            setConfirm={setConfirm}
+            onSendOtp={handleSendOtp}
+            onVerifyOtp={handleVerifyOtp}
+            onResetPassword={handleResetPassword}
+            onOtpChange={handleOtpChange}
+            onOtpKeyDown={handleOtpKeyDown}
+            onOtpPaste={handleOtpPaste}
+          />
+        </section>
       </div>
-
-      <style>{`
-        .otp-box {
-          width: 45px;
-          height: 50px;
-          font-size: 20px;
-          border: 1px solid #ccc;
-          border-radius: 10px;
-          outline: none;
-          transition: 0.2s;
-        }
-
-        .otp-box:focus {
-          border-color: #0d6efd;
-          box-shadow: 0 0 5px rgba(13,110,253,.5);
-        }
-      `}</style>
     </div>
   );
 }

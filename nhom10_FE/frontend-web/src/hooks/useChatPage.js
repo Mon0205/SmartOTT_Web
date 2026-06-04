@@ -133,7 +133,7 @@ export default function useChatPage() {
     const isGroup = conversation.type === "group";
 
     let name = conversation.name?.trim() || "Cuộc trò chuyện";
-    let avatar = conversation.avatar?.trim() || "https://i.pravatar.cc/50";
+    let avatar = conversation.avatar?.trim() || "";
 
     if (isGroup) {
       return {
@@ -141,7 +141,7 @@ export default function useChatPage() {
         _id: conversation._id,
         conversationId: conversation._id,
         name: conversation.name?.trim() || "Nhóm chat",
-        avatar: conversation.avatar?.trim() || "https://i.pravatar.cc/50",
+        avatar: conversation.avatar?.trim() || "",
         latestMessage: conversation.latestMessage || null,
         updatedAt:
           conversation.latestMessage?.createdAt ||

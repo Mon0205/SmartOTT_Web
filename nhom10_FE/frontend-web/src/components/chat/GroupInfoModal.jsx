@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ChatAvatar from "./ChatAvatar";
 // 👉 Nhớ import thêm getFriendRequestsAPI vào đây
 import { getFriendsAPI, sendFriendRequestAPI, getFriendRequestsAPI } from "../../api/friendAPI";
 import {
@@ -290,14 +291,7 @@ export default function GroupInfoModal({
           <h3 className="text-center fw-bold mb-3">Thông tin nhóm</h3>
 
           <div className="text-center mb-3">
-            <img
-              src={editAvatar || groupInfo?.avatar || "https://i.pravatar.cc/80"}
-              alt=""
-              width="80"
-              height="80"
-              className="rounded-circle"
-              style={{ objectFit: "cover" }}
-            />
+            <ChatAvatar src={editAvatar || groupInfo?.avatar} type="group" size={80} className="mx-auto" title={groupInfo?.name || "Nhom"} />
           </div>
 
           {isGroupDissolved ? (
@@ -357,14 +351,7 @@ export default function GroupInfoModal({
                   onClick={() => setSelectedMember(m.user)}
                   title="Xem thông tin"
                 >
-                  <img
-                    src={m.user?.avatar || "https://i.pravatar.cc/50"}
-                    alt=""
-                    width="42"
-                    height="42"
-                    className="rounded-circle me-2"
-                    style={{ objectFit: "cover" }}
-                  />
+                  <ChatAvatar src={m.user?.avatar} size={42} className="me-2" title={m.user?.fullName || m.user?.username || "User"} />
                   <div>
                     <div className="fw-semibold">
                       {m.user?.fullName || "Thanh vien"} {isMe && "(Ban)"}
@@ -443,14 +430,7 @@ export default function GroupInfoModal({
                         readOnly
                         className="me-2"
                       />
-                      <img
-                        src={user.avatar || "https://i.pravatar.cc/40"}
-                        alt=""
-                        width="36"
-                        height="36"
-                        className="rounded-circle me-2"
-                        style={{ objectFit: "cover" }}
-                      />
+                      <ChatAvatar src={user.avatar} size={36} className="me-2" title={user.fullName || user.username || "User"} />
                       <div>
                         <div>{user.fullName}</div>
                         <small className="text-muted">{user.email}</small>
@@ -536,13 +516,12 @@ export default function GroupInfoModal({
             style={{ width: "350px", maxWidth: "90%" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src={selectedMember.avatar || "https://i.pravatar.cc/150"}
-              alt=""
-              width="100"
-              height="100"
-              className="rounded-circle mb-3"
-              style={{ objectFit: "cover", border: "2px solid #ddd" }}
+            <ChatAvatar
+              src={selectedMember.avatar}
+              size={100}
+              className="mx-auto mb-3"
+              style={{ border: "2px solid #ddd" }}
+              title={selectedMember.fullName || selectedMember.username || "User"}
             />
             <h4 className="fw-bold mb-1">{selectedMember.fullName}</h4>
             <p className="text-muted mb-2">{selectedMember.email}</p>

@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaUserCircle, FaUserPlus, FaRobot, FaPlus, FaTrash, FaUsers } from "react-icons/fa";
+import { FaUserPlus, FaRobot, FaPlus, FaTrash } from "react-icons/fa";
 import { searchUsersAPI, sendFriendRequestAPI } from "../../api/friendAPI";
 import { getAiSessionsAPI, deleteAiSessionAPI } from "../../api/aiAPI";
 import CreateGroupModal from "./CreateGroupModal";
+import ChatAvatar from "./ChatAvatar";
 
 export default function Sidebar({
   tab,
@@ -149,62 +150,6 @@ export default function Sidebar({
     if (msg.type === "file") return `${prefix}Da gui file`;
     if (msg.type === "call") return `${prefix}Cuoc goi`;
     return `${prefix}${msg.content || "Tin nhan"}`;
-  };
-
-  const renderConversationAvatar = (chat) => {
-    const avatar = chat?.avatar && String(chat.avatar).trim();
-
-    if (avatar) {
-      return (
-        <img
-          src={avatar}
-          alt=""
-          className="rounded-circle me-2 flex-shrink-0"
-          width="40"
-          height="40"
-          style={{ objectFit: "cover" }}
-        />
-      );
-    }
-
-    const Icon = chat?.type === "group" ? FaUsers : FaUserCircle;
-    const bg = chat?.type === "group" ? "#e7f1ff" : "#f1f3f5";
-    const color = chat?.type === "group" ? "#0d6efd" : "#6c757d";
-
-    return (
-      <div
-        className="rounded-circle me-2 d-flex align-items-center justify-content-center flex-shrink-0"
-        style={{ width: 40, height: 40, background: bg, color }}
-      >
-        <Icon size={22} />
-      </div>
-    );
-  };
-
-  const renderUserAvatar = (user, size = 60) => {
-    const avatar = user?.avatar && String(user.avatar).trim();
-
-    if (avatar) {
-      return (
-        <img
-          src={avatar}
-          alt=""
-          className="rounded-circle me-3"
-          width={size}
-          height={size}
-          style={{ objectFit: "cover" }}
-        />
-      );
-    }
-
-    return (
-      <div
-        className="rounded-circle me-3 d-flex align-items-center justify-content-center flex-shrink-0"
-        style={{ width: size, height: size, background: "#f1f3f5", color: "#6c757d" }}
-      >
-        <FaUserCircle size={Math.round(size * 0.58)} />
-      </div>
-    );
   };
 
   return (
@@ -364,7 +309,7 @@ export default function Sidebar({
                       }}
                       onClick={() => setSelected(chat)}
                     >
-                      {renderConversationAvatar(chat)}
+                      <ChatAvatar src={chat.avatar} type={chat.type === "group" ? "group" : "user"} size={40} className="me-2" title={chat.name || "User"} />
                       <div className="flex-grow-1" style={{ minWidth: 0, overflow: "hidden" }}>
                         <div className="d-flex align-items-center" style={{ minWidth: 0 }}>
                           <span className="fw-bold" title={chat.name || "User"} style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -527,7 +472,7 @@ export default function Sidebar({
                 return (
                   <div key={user._id} className="border rounded p-3 mb-3" style={{ background: "#fff" }}>
                     <div className="d-flex align-items-start">
-                      {renderUserAvatar(user, 60)}
+                      <ChatAvatar src={user.avatar} size={60} className="me-3" title={user.fullName || user.username || "User"} />
                       <div className="flex-grow-1">
                         <div className="fw-bold fs-6">{user.fullName || "Chưa có tên"}</div>
                         <div className="text-muted small mb-1">Username: {user.username || "Chưa cập nhật"}</div>

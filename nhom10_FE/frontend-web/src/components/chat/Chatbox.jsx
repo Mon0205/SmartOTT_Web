@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import VideoCall from './VideoCall';
+import ChatAvatar from "./ChatAvatar";
 // 👉 Thêm FaShare vào import icons
 import { FaVideo, FaPhoneAlt, FaReply, FaThumbtack, FaPen, FaTrash, FaHeart, FaShare, FaLock, FaPaperclip, FaSmile, FaPaperPlane, FaInfo, FaFilePdf, FaFileWord, FaFileExcel, FaFileAlt, FaDownload, FaFileImage, FaFileVideo, FaSearch, FaTimes } from "react-icons/fa";
 import {
@@ -1215,18 +1216,12 @@ export default function ChatBox({
       >
         {/* AVATAR */}
         {!isMe && (
-          <img
-            src={
-              (typeof sender === "object" && sender?.avatar) ||
-              selected.avatar ||
-              `https://ui-avatars.com/api/?name=${senderName || "U"}`
-            }
-            alt="avatar"
-            className="rounded-circle me-2 align-self-end"
-            width="28"
-            height="28"
+          <ChatAvatar
+            src={(typeof sender === "object" && sender?.avatar) || selected.avatar}
+            size={28}
+            className="me-2 align-self-end"
+            title={senderName}
             style={{
-              objectFit: "cover",
               marginBottom: "2px",
               border: "1px solid #eee",
             }}
@@ -1673,10 +1668,6 @@ export default function ChatBox({
             <div className="text-center text-muted">Bạn hiện chưa có bạn bè</div>
           ) : (
             friends.map((friend) => {
-              const avatar =
-                friend.avatar && String(friend.avatar).trim()
-                  ? friend.avatar
-                  : "https://i.pravatar.cc/50";
               return (
                 <div
                   key={friend._id}
@@ -1698,13 +1689,7 @@ export default function ChatBox({
                   }}
                 >
                   <div className="d-flex align-items-center min-w-0">
-                    <img
-                      src={avatar}
-                      alt=""
-                      className="rounded-circle me-2 flex-shrink-0"
-                      width="45"
-                      height="45"
-                    />
+                    <ChatAvatar src={friend.avatar} size={45} className="me-2" title={friend.fullName || friend.username || "User"} />
                     <div className="min-w-0">
                       <div className="fw-bold text-truncate">
                         {friend.fullName || friend.username || "User"}
@@ -1768,24 +1753,13 @@ export default function ChatBox({
               <div className="text-muted">Hiện không có lời mời nào cho bạn</div>
             ) : (
               receivedRequests.map((item) => {
-                const avatar =
-                  item.userId?.avatar && String(item.userId.avatar).trim()
-                    ? item.userId.avatar
-                    : "https://i.pravatar.cc/50";
-
                 return (
                   <div
                     key={item._id}
                     className="d-flex justify-content-between align-items-center p-2 border rounded mb-2"
                   >
                     <div className="d-flex align-items-center">
-                      <img
-                        src={avatar}
-                        alt=""
-                        className="rounded-circle me-2"
-                        width="45"
-                        height="45"
-                      />
+                      <ChatAvatar src={item.userId?.avatar} size={45} className="me-2" title={item.userId?.fullName || item.userId?.username || "User"} />
                       <div>
                         <div className="fw-bold">
                           {item.userId?.fullName || item.userId?.username || "User"}
@@ -1829,24 +1803,13 @@ export default function ChatBox({
               <div className="text-muted">Bạn chưa gửi lời mời nào</div>
             ) : (
               sentRequests.map((item) => {
-                const avatar =
-                  item.friendId?.avatar && String(item.friendId.avatar).trim()
-                    ? item.friendId.avatar
-                    : "https://i.pravatar.cc/50";
-
                 return (
                   <div
                     key={item._id}
                     className="d-flex justify-content-between align-items-center p-2 border rounded mb-2"
                   >
                     <div className="d-flex align-items-center">
-                      <img
-                        src={avatar}
-                        alt=""
-                        className="rounded-circle me-2"
-                        width="45"
-                        height="45"
-                      />
+                      <ChatAvatar src={item.friendId?.avatar} size={45} className="me-2" title={item.friendId?.fullName || item.friendId?.username || "User"} />
                       <div>
                         <div className="fw-bold">
                           {item.friendId?.fullName ||
@@ -1931,15 +1894,7 @@ export default function ChatBox({
       <div className="p-3 border-bottom bg-white d-flex justify-content-between align-items-center shadow-sm">
         <div className="d-flex align-items-center gap-3">
           <div style={{ position: "relative" }}>
-            <img
-              src={
-                selected.avatar ||
-                `https://ui-avatars.com/api/?name=${selected.name || "U"}`
-              }
-              className="rounded-circle"
-              width="45"
-              height="45"
-            />
+            <ChatAvatar src={selected.avatar} type={selected.type === "group" ? "group" : "user"} size={45} title={selected.name || "User"} />
 
             {/* 🟢 DOT ONLINE */}
             <span
@@ -2314,17 +2269,11 @@ export default function ChatBox({
             ) : (
               <>
                 <div className="text-center pb-3 border-bottom">
-                  <img
-                    src={
-                      userInfo?.user?.avatar ||
-                      selected?.avatar ||
-                      `https://ui-avatars.com/api/?name=${userInfo?.user?.fullName || selected?.name || "U"}`
-                    }
-                    alt=""
-                    className="rounded-circle mb-2"
-                    width="92"
-                    height="92"
-                    style={{ objectFit: "cover" }}
+                  <ChatAvatar
+                    src={userInfo?.user?.avatar || selected?.avatar}
+                    size={92}
+                    className="mx-auto mb-2"
+                    title={userInfo?.user?.fullName || selected?.name || "Nguoi dung"}
                   />
                   <h5 className="fw-bold mb-1">
                     {userInfo?.user?.fullName || userInfo?.user?.username || selected?.name || "Nguoi dung"}
@@ -2349,14 +2298,7 @@ export default function ChatBox({
                         key={group._id}
                         className="d-flex align-items-center gap-3 p-2 border rounded mb-2"
                       >
-                        <img
-                          src={group.avatar || `https://ui-avatars.com/api/?name=${group.name || "G"}`}
-                          alt=""
-                          className="rounded-circle"
-                          width="42"
-                          height="42"
-                          style={{ objectFit: "cover" }}
-                        />
+                        <ChatAvatar src={group.avatar} type="group" size={42} title={group.name || "Nhom"} />
                         <div className="min-w-0">
                           <div className="fw-semibold text-truncate">{group.name || "Nhom chat"}</div>
                           <small className="text-muted">{group.memberCount || 0} thanh vien</small>
@@ -2398,7 +2340,6 @@ export default function ChatBox({
                 conversationsList.map((item) => {
                   const isSelected = selectedForwardTargets.includes(item._id);
                   const targetName = item.name;
-                  const avatar = item.avatar || "https://i.pravatar.cc/100";
 
                   return (
                     <div
@@ -2414,12 +2355,7 @@ export default function ChatBox({
                         readOnly
                         style={{ transform: "scale(1.2)", cursor: "pointer" }}
                       />
-                      <img
-                        src={avatar}
-                        alt={targetName}
-                        style={{ width: "45px", height: "45px", borderRadius: "50%", objectFit: "cover" }}
-                        className="me-3"
-                      />
+                      <ChatAvatar src={item.avatar} type={item.isGroup ? "group" : "user"} size={45} className="me-3" title={targetName} />
                       <div>
                         <div className="fw-bold">{targetName}</div>
                         {item.isGroup && <small className="text-muted">Nhóm chat</small>}

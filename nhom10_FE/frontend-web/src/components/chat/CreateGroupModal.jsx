@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getFriendsAPI } from "../../api/friendAPI";
 import { createGroupAPI } from "../../api/chatApi";
+import ChatAvatar from "./ChatAvatar";
 
 export default function CreateGroupModal({
   setShowCreateGroupModal,
@@ -125,11 +126,6 @@ export default function CreateGroupModal({
             {friends.map((friend) => {
               const user = friend.friendInfo || friend.user || friend;
 
-              const avatar =
-                user.avatar && String(user.avatar).trim()
-                  ? user.avatar
-                  : "https://i.pravatar.cc/60";
-
               const checked = selectedMembers.includes(user._id);
 
               return (
@@ -149,13 +145,7 @@ export default function CreateGroupModal({
                     className="me-2"
                   />
 
-                  <img
-                    src={avatar}
-                    alt=""
-                    className="rounded-circle me-2"
-                    width="42"
-                    height="42"
-                  />
+                  <ChatAvatar src={user.avatar} size={42} className="me-2" title={user.fullName || user.username || "User"} />
 
                   <div>
                     <div className="fw-semibold">

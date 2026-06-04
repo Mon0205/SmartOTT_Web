@@ -143,16 +143,16 @@ export default function AuthPage() {
               <FaComments />
             </div>
             <div>
-              <div className="auth-brand-name">ConnectHub</div>
-              <div className="auth-brand-subtitle">Chat, nhom va AI tro ly</div>
+              <div className="auth-brand-name">SmartOTT</div>
+              <div className="auth-brand-subtitle">Trò chuyện, nhóm và AI trợ lý</div>
             </div>
           </div>
 
           <div className="auth-hero">
-            <h1>Ket noi moi cuoc tro chuyen trong mot noi.</h1>
+            <h1>Kết nối mọi cuộc trò chuyện trong một nơi.</h1>
             <p>
-              Dang nhap de tiep tuc nhan tin, quan ly nhom chat va su dung tro ly AI
-              trong khong gian lam viec gon gang.
+              Đăng nhập để tiếp tục nhận tin, quản lý nhóm chat và sử dụng trợ lý AI
+              trong không gian làm việc gọn gàng.
             </p>
           </div>
 
@@ -160,22 +160,22 @@ export default function AuthPage() {
             <div className="auth-feature">
               <span><FaLock /></span>
               <div>
-                <strong>Bao mat phien dang nhap</strong>
-                <small>Dong bo realtime va bao ve tai khoan cua ban.</small>
+                <strong>Bảo mật phiên đăng nhập</strong>
+                <small>Đồng bộ realtime và bảo vệ tài khoản của bạn.</small>
               </div>
             </div>
             <div className="auth-feature">
               <span><FaUsers /></span>
               <div>
-                <strong>Tro chuyen ca nhan va nhom</strong>
-                <small>Theo doi tin moi, loi moi va cac nhom dang tham gia.</small>
+                <strong>Trò chuyện cá nhân và nhóm</strong>
+                <small>Theo dõi tin mới, lời mới và các nhóm đang tham gia.</small>
               </div>
             </div>
             <div className="auth-feature">
               <span><FaShieldAlt /></span>
               <div>
-                <strong>Quan tri ro rang</strong>
-                <small>Luong admin tach rieng, de quan ly va kiem soat.</small>
+                <strong>Quản trị rõ ràng</strong>
+                <small>Luồng admin tách riêng, dễ quản lý và kiểm soát.</small>
               </div>
             </div>
           </div>
@@ -187,13 +187,13 @@ export default function AuthPage() {
               <div className="auth-logo small">
                 <FaComments />
               </div>
-              <span>ConnectHub</span>
+              <span>SmartOTT</span>
             </div>
-            <h2>{isLogin ? "Dang nhap" : "Tao tai khoan"}</h2>
+            <h2>{isLogin ? "Đăng nhập" : "Tạo tài khoản"}</h2>
             <p>
               {isLogin
-                ? "Chao mung tro lai. Nhap thong tin de tiep tuc."
-                : "Dang ky bang email va xac thuc OTP de bat dau."}
+                ? "Chào mừng trở lại. Nhập thông tin để tiếp tục."
+                : "Đăng ký bằng email và xác thực OTP để bắt đầu."}
             </p>
           </div>
 
