@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaCommentDots, FaUsers, FaSignOutAlt, FaRobot } from "react-icons/fa";
+import { FaCommentDots, FaUsers, FaSignOutAlt, FaRobot, FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { updateProfile, updateAvatar, updatePassword, deleteMyAccount } from "../../api/userApi";
@@ -11,13 +11,14 @@ export default function Panel({
   setFriendSection,
   hasNewFriendRequest,
 }) {
-  const { user, logout: authLogout } = useAuth();
+  const { user, setUser, logout: authLogout } = useAuth();
   const navigate = useNavigate();
 
   const [showProfile, setShowProfile] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [newAvatarFile, setNewAvatarFile] = useState(null);
 
   const [errors, setErrors] = useState({});
@@ -147,6 +148,7 @@ export default function Panel({
       newPassword: "",
       confirmPassword: "",
     });
+    setShowPasswordForm(false);
     setSuccess(res?.message || "Doi mat khau thanh cong!");
     setIsPasswordLoading(false);
   };
@@ -241,10 +243,62 @@ export default function Panel({
     logout();
   };
 
+  const closeProfileModal = () => {
+    setShowProfile(false);
+    setIsEditing(false);
+    setNewAvatarFile(null);
+    setShowPasswordForm(false);
+    setErrors({});
+    setSuccess("");
+    setPasswordForm({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+    setForm({
+      fullName: user.fullName || "",
+      phone: user.phone || "",
+      bio: user.bio || "",
+      avatarPreview: user.avatar || "",
+    });
+  };
+
   const avatarSrc =
     form.avatarPreview ||
-    user.avatar ||
-    `https://ui-avatars.com/api/?name=${user.username || "U"}`;
+    (user.avatar && String(user.avatar).trim() ? user.avatar : "");
+
+  const renderAvatar = (size, extraClass = "") => {
+    if (avatarSrc) {
+      return (
+        <img
+          src={avatarSrc}
+          className={`rounded-circle ${extraClass}`}
+          width={size}
+          height={size}
+          style={{ cursor: "pointer", objectFit: "cover" }}
+          onClick={() => setShowProfile(true)}
+          alt="avatar"
+        />
+      );
+    }
+
+    return (
+      <div
+        className={`rounded-circle d-flex align-items-center justify-content-center ${extraClass}`}
+        style={{
+          width: size,
+          height: size,
+          cursor: "pointer",
+          background: "#f1f3f5",
+          color: "#6c757d",
+        }}
+        onClick={() => setShowProfile(true)}
+        aria-label="avatar"
+      >
+        <FaUserCircle size={Math.round(size * 0.62)} />
+      </div>
+    );
+  };
 
   return (
     <>
@@ -253,15 +307,7 @@ export default function Panel({
         style={{ width: "60px" }}
       >
         <div className="d-flex flex-column align-items-center">
-          <img
-            src={avatarSrc}
-            className="rounded-circle mb-3"
-            width="40"
-            height="40"
-            style={{ cursor: "pointer", objectFit: "cover" }}
-            onClick={() => setShowProfile(true)}
-            alt="avatar"
-          />
+          {renderAvatar(40, "mb-3")}
 
           {/* TAB CHAT */}
           <button
@@ -326,7 +372,7 @@ export default function Panel({
         <div
           className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
           style={{ background: "rgba(0,0,0,0.5)", zIndex: 9999 }}
-          onClick={() => !isEditing && setShowProfile(false)}
+          onClick={() => !isEditing && closeProfileModal()}
         >
           <div
             className="bg-white p-4 rounded shadow text-center"
@@ -343,14 +389,7 @@ export default function Panel({
               <div className="alert alert-success py-1">{success}</div>
             )}
 
-            <img
-              src={avatarSrc}
-              className="rounded-circle mb-2"
-              width="80"
-              height="80"
-              alt="avatar"
-              style={{ objectFit: "cover" }}
-            />
+            {renderAvatar(80, "mx-auto mb-2")}
 
             {errors.avatar && (
               <div className="text-danger small mb-2">{errors.avatar}</div>
@@ -412,43 +451,82 @@ export default function Panel({
             )}
 
             <div className="text-start mt-3 pt-3 border-top">
-              <div className="fw-semibold mb-2">Doi mat khau</div>
+              {!showPasswordForm ? (
+                <button
+                  className="btn btn-outline-primary w-100"
+                  onClick={() => {
+                    setPasswordForm({
+                      currentPassword: "",
+                      newPassword: "",
+                      confirmPassword: "",
+                    });
+                    setErrors((prev) => ({ ...prev, password: "" }));
+                    setShowPasswordForm(true);
+                  }}
+                >
+                  Doi mat khau
+                </button>
+              ) : (
+                <>
+                  <div className="fw-semibold mb-2">Doi mat khau</div>
 
-              <input
-                type="password"
-                placeholder="Mat khau hien tai"
-                className="form-control mb-2"
-                value={passwordForm.currentPassword}
-                onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
-              />
+                  <input
+                    type="password"
+                    placeholder="Mat khau hien tai"
+                    className="form-control mb-2"
+                    value={passwordForm.currentPassword}
+                    autoComplete="new-password"
+                    onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
+                  />
 
-              <input
-                type="password"
-                placeholder="Mat khau moi"
-                className="form-control mb-2"
-                value={passwordForm.newPassword}
-                onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
-              />
+                  <input
+                    type="password"
+                    placeholder="Mat khau moi"
+                    className="form-control mb-2"
+                    value={passwordForm.newPassword}
+                    autoComplete="new-password"
+                    onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
+                  />
 
-              <input
-                type="password"
-                placeholder="Nhap lai mat khau moi"
-                className="form-control mb-2"
-                value={passwordForm.confirmPassword}
-                onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
-              />
+                  <input
+                    type="password"
+                    placeholder="Nhap lai mat khau moi"
+                    className="form-control mb-2"
+                    value={passwordForm.confirmPassword}
+                    autoComplete="new-password"
+                    onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
+                  />
 
-              {errors.password && (
-                <div className="text-danger small mb-2">{errors.password}</div>
+                  {errors.password && (
+                    <div className="text-danger small mb-2">{errors.password}</div>
+                  )}
+
+                  <div className="d-flex gap-2">
+                    <button
+                      className="btn btn-outline-primary flex-fill"
+                      onClick={handleUpdatePassword}
+                      disabled={isPasswordLoading}
+                    >
+                      {isPasswordLoading ? "Dang doi..." : "Cap nhat mat khau"}
+                    </button>
+                    <button
+                      className="btn btn-outline-secondary"
+                      onClick={() => {
+                        setShowPasswordForm(false);
+                        setPasswordForm({
+                          currentPassword: "",
+                          newPassword: "",
+                          confirmPassword: "",
+                        });
+                        setErrors((prev) => ({ ...prev, password: "" }));
+                      }}
+                      disabled={isPasswordLoading}
+                    >
+                      Huy
+                    </button>
+                  </div>
+                </>
               )}
-
-              <button
-                className="btn btn-outline-primary w-100"
-                onClick={handleUpdatePassword}
-                disabled={isPasswordLoading}
-              >
-                {isPasswordLoading ? "Dang doi..." : "Cap nhat mat khau"}
-              </button>
             </div>
 
             <div className="d-flex justify-content-between mt-3">
@@ -471,24 +549,7 @@ export default function Panel({
 
               <button
                 className="btn btn-secondary w-50 ms-1"
-                onClick={() => {
-                  setShowProfile(false);
-                  setIsEditing(false);
-                  setNewAvatarFile(null);
-                  setErrors({});
-                  setSuccess("");
-                  setPasswordForm({
-                    currentPassword: "",
-                    newPassword: "",
-                    confirmPassword: "",
-                  });
-                  setForm({
-                    fullName: user.fullName || "",
-                    phone: user.phone || "",
-                    bio: user.bio || "",
-                    avatarPreview: user.avatar || "",
-                  });
-                }}
+                onClick={closeProfileModal}
               >
                 Đóng
               </button>

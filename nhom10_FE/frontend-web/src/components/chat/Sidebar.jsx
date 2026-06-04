@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaUserPlus, FaRobot, FaPlus, FaTrash } from "react-icons/fa";
+import { FaUserCircle, FaUserPlus, FaRobot, FaPlus, FaTrash, FaUsers } from "react-icons/fa";
 import { searchUsersAPI, sendFriendRequestAPI } from "../../api/friendAPI";
 import { getAiSessionsAPI, deleteAiSessionAPI } from "../../api/aiAPI";
 import CreateGroupModal from "./CreateGroupModal";
@@ -151,18 +151,78 @@ export default function Sidebar({
     return `${prefix}${msg.content || "Tin nhan"}`;
   };
 
+  const renderConversationAvatar = (chat) => {
+    const avatar = chat?.avatar && String(chat.avatar).trim();
+
+    if (avatar) {
+      return (
+        <img
+          src={avatar}
+          alt=""
+          className="rounded-circle me-2 flex-shrink-0"
+          width="40"
+          height="40"
+          style={{ objectFit: "cover" }}
+        />
+      );
+    }
+
+    const Icon = chat?.type === "group" ? FaUsers : FaUserCircle;
+    const bg = chat?.type === "group" ? "#e7f1ff" : "#f1f3f5";
+    const color = chat?.type === "group" ? "#0d6efd" : "#6c757d";
+
+    return (
+      <div
+        className="rounded-circle me-2 d-flex align-items-center justify-content-center flex-shrink-0"
+        style={{ width: 40, height: 40, background: bg, color }}
+      >
+        <Icon size={22} />
+      </div>
+    );
+  };
+
+  const renderUserAvatar = (user, size = 60) => {
+    const avatar = user?.avatar && String(user.avatar).trim();
+
+    if (avatar) {
+      return (
+        <img
+          src={avatar}
+          alt=""
+          className="rounded-circle me-3"
+          width={size}
+          height={size}
+          style={{ objectFit: "cover" }}
+        />
+      );
+    }
+
+    return (
+      <div
+        className="rounded-circle me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+        style={{ width: size, height: size, background: "#f1f3f5", color: "#6c757d" }}
+      >
+        <FaUserCircle size={Math.round(size * 0.58)} />
+      </div>
+    );
+  };
+
   return (
     <>
       <div
         className="col-3 bg-white p-2"
         style={{
           width: "320px",
+          minWidth: "320px",
+          maxWidth: "320px",
+          flex: "0 0 320px",
           height: "100vh",
           maxHeight: "100vh",
           minHeight: 0,
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          overflowX: "hidden",
           borderRight: "1px solid #eee",
         }}
       >
@@ -181,7 +241,7 @@ export default function Sidebar({
                   ? "Chọn chức năng bạn bè..."
                   : "Tìm kiếm lịch sử AI..."
             }
-            style={{ border: "none", outline: "none", flex: 1 }}
+            style={{ border: "none", outline: "none", flex: 1, minWidth: 0 }}
           />
 
           <span style={{ color: "#ccc", padding: "0 8px" }}>|</span>
@@ -270,7 +330,7 @@ export default function Sidebar({
                 ))}
               </div>
 
-              <div style={{ flex: 1, minHeight: 0, overflowY: "auto", paddingRight: 2 }}>
+              <div style={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden", paddingRight: 2 }}>
               {filteredContacts.length === 0 ? (
                 <div className="p-3 text-muted text-center">Không có cuộc trò chuyện</div>
               ) : (
@@ -290,11 +350,6 @@ export default function Sidebar({
                   };
 
                   const lastMessage = formatLastMessagePreview(chat);
-                  const avatar =
-                    chat.avatar && String(chat.avatar).trim()
-                      ? chat.avatar
-                      : "https://i.pravatar.cc/50";
-
                   return (
                     <div
                       key={chat._id || index}
@@ -303,27 +358,33 @@ export default function Sidebar({
                         cursor: "pointer",
                         backgroundColor: isActive ? "#f1f1f1" : "white",
                         borderRadius: "10px",
+                        width: "100%",
+                        minWidth: 0,
+                        overflow: "hidden",
                       }}
                       onClick={() => setSelected(chat)}
                     >
-                      <img src={avatar} alt="" className="rounded-circle me-2" width="40" height="40" />
-                      <div className="flex-grow-1">
-                        <div className="fw-bold">
-                          {chat.name || "User"}
+                      {renderConversationAvatar(chat)}
+                      <div className="flex-grow-1" style={{ minWidth: 0, overflow: "hidden" }}>
+                        <div className="d-flex align-items-center" style={{ minWidth: 0 }}>
+                          <span className="fw-bold" title={chat.name || "User"} style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {chat.name || "User"}
+                          </span>
                           {chat.type === "group" && (
                             <span
                               style={{
                                 marginLeft: 6, background: "#0d6efd", color: "#fff",
                                 fontSize: 10, padding: "2px 6px", borderRadius: 8,
+                                flexShrink: 0,
                               }}
                             >
                               Nhóm
                             </span>
                           )}
                         </div>
-                        <small className="text-muted">{lastMessage}</small>
+                        <small className="text-muted" title={lastMessage} style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lastMessage}</small>
                         {chat.type === "group" && (
-                          <div style={{ fontSize: 11, color: "#888" }}>
+                          <div style={{ fontSize: 11, color: "#888", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {chat.memberCount || chat.members?.length || 0} thành viên
                           </div>
                         )}
@@ -333,6 +394,7 @@ export default function Sidebar({
                           style={{
                             background: "red", color: "#fff", borderRadius: "50%",
                             padding: "2px 6px", fontSize: 12, minWidth: 18, textAlign: "center",
+                            flexShrink: 0,
                           }}
                         >
                           {unreadMap[chat._id]}
@@ -386,7 +448,7 @@ export default function Sidebar({
                 </div>
                 <div className="flex-grow-1 fw-bold text-dark">Đoạn chat mới</div>
               </div>
-              <div style={{ flex: 1, minHeight: 0, overflowY: "auto", paddingRight: 2 }}>
+              <div style={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden", paddingRight: 2 }}>
               {aiSessions.length === 0 ? (
                 <div className="p-3 text-muted text-center small">Chưa có lịch sử trò chuyện</div>
               ) : (
@@ -398,21 +460,25 @@ export default function Sidebar({
                       cursor: "pointer",
                       backgroundColor: selected?._id === session._id && !selected?.isNew ? "#e0f2fe" : "white",
                       borderRadius: "10px",
+                      width: "100%",
+                      minWidth: 0,
+                      overflow: "hidden",
                     }}
                     onClick={() =>
                       setSelected({ isAI: true, name: session.title, _id: session._id, isNew: false })
                     }
                   >
                     <div
-                      className="rounded-circle me-3 d-flex justify-content-center align-items-center"
+                      className="rounded-circle me-3 d-flex justify-content-center align-items-center flex-shrink-0"
                       style={{ width: "40px", height: "40px", backgroundColor: "#64748b" }}
                     >
                       <FaRobot size={18} color="#fff" />
                     </div>
-                    <div className="flex-grow-1 pe-4">
+                    <div className="flex-grow-1 pe-4" style={{ minWidth: 0, overflow: "hidden" }}>
                       <div
                         className="fw-bold text-dark"
-                        style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "180px" }}
+                        title={session.title || "Cuá»™c trÃ² chuyá»‡n"}
+                        style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                       >
                         {session.title || "Cuộc trò chuyện"}
                       </div>
@@ -458,12 +524,10 @@ export default function Sidebar({
                 <div className="text-center text-muted">Không tìm thấy người dùng phù hợp</div>
               )}
               {searchResult.map((user) => {
-                const avatar =
-                  user.avatar && String(user.avatar).trim() ? user.avatar : "https://i.pravatar.cc/80";
                 return (
                   <div key={user._id} className="border rounded p-3 mb-3" style={{ background: "#fff" }}>
                     <div className="d-flex align-items-start">
-                      <img src={avatar} alt="" className="rounded-circle me-3" width="60" height="60" style={{ objectFit: "cover" }} />
+                      {renderUserAvatar(user, 60)}
                       <div className="flex-grow-1">
                         <div className="fw-bold fs-6">{user.fullName || "Chưa có tên"}</div>
                         <div className="text-muted small mb-1">Username: {user.username || "Chưa cập nhật"}</div>
