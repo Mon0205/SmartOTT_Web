@@ -149,6 +149,33 @@ const VideoCall = forwardRef(({ socket, currentUser, partnerId, conversationId, 
     }
   };
 
+  const handleRemoteOffer = async (data) => {
+    const pc = peerConnectionRef.current;
+
+    if (!pc) {
+      pendingOfferRef.current = data;
+      return;
+    }
+
+    try {
+      await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+      await processIceQueue();
+
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+
+      socket.emit("webrtc_answer", {
+        receiverId: data.senderId,
+        answer,
+        callId: data.callId
+      });
+
+      pendingOfferRef.current = null;
+    } catch (e) {
+      console.error("Loi xu ly Offer:", e);
+    }
+  };
+
   useEffect(() => {
     const handleLeave = () => {
       if (currentCallIdRef.current) {
@@ -191,9 +218,7 @@ const VideoCall = forwardRef(({ socket, currentUser, partnerId, conversationId, 
       }
     });
 
-    socket.on("webrtc_offer", async (data) => {
-      pendingOfferRef.current = data;
-    });
+    socket.on("webrtc_offer", handleRemoteOffer);
 
     socket.on("webrtc_answer", async (data) => {
       try {
