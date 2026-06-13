@@ -2,7 +2,7 @@ import Constants from "expo-constants";
 import { Platform } from "react-native";
 
 const PORT = 3000;
-const LAN_IP = " 192.168.61.1";
+const LAN_IP = " 192.168.254.154";
 
 const trimTrailingSlash = (url) => url.replace(/\/+$/, "");
 

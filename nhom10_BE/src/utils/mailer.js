@@ -1,50 +1,50 @@
-// const nodemailer = require("nodemailer");
+const sgMail = require("@sendgrid/mail");
 
-// const sendOTP = async (email, otp, subject = "Mã OTP xác thực") => {
-//     const transporter = nodemailer.createTransport({
-//         service: "gmail",
-//         auth: {
-//             user: process.env.EMAIL_USER,
-//             pass: process.env.EMAIL_PASS
-//         }
-//     });
+const sendgridApiKey = process.env.SENDGRID_API_KEY;
+const fromEmail = process.env.SENDGRID_FROM_EMAIL;
+const fromName = process.env.SENDGRID_FROM_NAME || "Your App";
 
-//     await transporter.sendMail({
-//         from: `"Your App" <${process.env.EMAIL_USER}>`,
-//         to: email,
-//         subject,
-//         html: `
-//             <h2>OTP của bạn là:</h2>
-//             <h1>${otp}</h1>
-//             <p>OTP có hiệu lực trong 5 phút</p>
-//         `
-//     });
-// };
+if (sendgridApiKey) {
+  sgMail.setApiKey(sendgridApiKey);
+}
 
-// module.exports = { sendOTP };
-const nodemailer = require("nodemailer");
+const ensureSendGridConfig = () => {
+  if (!sendgridApiKey) {
+    throw new Error("Thieu SENDGRID_API_KEY");
+  }
 
-// 🔥 tạo transporter 1 lần (tối ưu)
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+  if (!fromEmail) {
+    throw new Error("Thieu SENDGRID_FROM_EMAIL");
+  }
+};
+
+const sendEmail = async ({ to, subject, html, text, from = fromName }) => {
+  ensureSendGridConfig();
+
+  await sgMail.send({
+    from: {
+      email: fromEmail,
+      name: from,
+    },
+    to,
+    subject,
+    text,
+    html,
+  });
+};
 
 // ================= OTP =================
-const sendOTP = async (email, otp) => {
-  await transporter.sendMail({
-    from: `"Your App" <${process.env.EMAIL_USER}>`,
+const sendOTP = async (email, otp, subject = "Ma OTP xac thuc") => {
+  await sendEmail({
     to: email,
-    subject: "Mã OTP xác thực",
+    subject,
+    text: `Ma OTP cua ban la: ${otp}. OTP co hieu luc trong 5 phut.`,
     html: `
-      <div style="font-family: Arial; text-align: center;">
-        <h2>🔐 Xác thực OTP</h2>
-        <p>Mã OTP của bạn là:</p>
+      <div style="font-family: Arial, sans-serif; text-align: center;">
+        <h2>Xac thuc OTP</h2>
+        <p>Ma OTP cua ban la:</p>
         <h1 style="color: #0d6efd;">${otp}</h1>
-        <p>OTP có hiệu lực trong 5 phút</p>
+        <p>OTP co hieu luc trong 5 phut</p>
       </div>
     `,
   });
@@ -52,17 +52,18 @@ const sendOTP = async (email, otp) => {
 
 // ================= WARNING =================
 const sendWarningEmail = async (email, message) => {
-  await transporter.sendMail({
-    from: `"Security Alert" <${process.env.EMAIL_USER}>`,
+  await sendEmail({
     to: email,
-    subject: "⚠️ Cảnh báo bảo mật",
+    subject: "Canh bao bao mat",
+    text: `${message}\nNeu day khong phai ban, hay doi mat khau ngay!`,
     html: `
-      <div style="font-family: Arial;">
-        <h2 style="color:red;">⚠️ Cảnh báo bảo mật</h2>
+      <div style="font-family: Arial, sans-serif;">
+        <h2 style="color:red;">Canh bao bao mat</h2>
         <p>${message}</p>
-        <p>Nếu đây không phải bạn, hãy đổi mật khẩu ngay!</p>
+        <p>Neu day khong phai ban, hay doi mat khau ngay!</p>
       </div>
     `,
+    from: "Security Alert",
   });
 };
 

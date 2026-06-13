@@ -34,7 +34,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Debug ENV (test OTP mail)
-console.log("📧 EMAIL_USER:", process.env.EMAIL_USER);
+console.log("SendGrid mail config:", {
+  hasApiKey: Boolean(process.env.SENDGRID_API_KEY),
+  fromEmail: process.env.SENDGRID_FROM_EMAIL || null,
+});
 
 // ==========================================
 // 2. TEST SERVER
